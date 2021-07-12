@@ -80,14 +80,26 @@ RCT_EXPORT_METHOD(createEntityField:(NSString *)objectFieldName doCreate:(BOOL)d
     }
 }
 
-RCT_EXPORT_METHOD(createEntity:(NSString *)objectType linkToTranscriptField:(NSString *)linkToTranscriptField
-                  showOnCreate:(BOOL)showOnCreate keysEntityFieldToLink:(NSArray<NSString *> *)keysEntityFieldToMap)
+RCT_EXPORT_METHOD(createEntity:(NSString *)objectType
+              saveToTranscript:(NSString *)saveToTranscript
+              linkToEntityName:(NSString *)linkToEntityName
+             linkToEntityField:(NSString *)linkToEntityField
+                  showOnCreate:(BOOL)showOnCreate
+         keysEntityFieldToLink:(NSArray<NSString *> *)keysEntityFieldToMap)
 {
     SCSPrechatEntity* entity = [[SCSPrechatEntity alloc] initWithEntityName:objectType];
     entity.showOnCreate = showOnCreate;
 
-    if (linkToTranscriptField != nil) {
-        entity.saveToTranscript = linkToTranscriptField;
+    if (saveToTranscript != nil) {
+        entity.saveToTranscript = saveToTranscript;
+    }
+
+    if (linkToEntityName != nil) {
+        entity.linkToEntityName = linkToEntityName;
+    }
+
+    if (linkToEntityField != nil) {
+        entity.linkToEntityField = linkToEntityField;
     }
 
     for (id entityFieldKey in keysEntityFieldToMap) {

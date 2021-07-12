@@ -107,19 +107,21 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void createEntity(String objectType, @Nullable String linkToTranscriptField, Boolean showOnCreate, @Nullable ReadableArray keysEntityFieldToMap) {
+	public void createEntity(String objectType, @Nullable String linkToTranscriptField, @Nullable String linkToEntityName, @Nullable String linkToEntityField, Boolean showOnCreate, @Nullable ReadableArray keysEntityFieldToMap) {
 		ChatEntity entity;
 
+		ChatEntity.Builder entityBuilder = new ChatEntity.Builder();
+		entityBuilder.showOnCreate(showOnCreate);
+
 		if (linkToTranscriptField != null) {
-			entity = new ChatEntity.Builder()
-					.linkToTranscriptField(linkToTranscriptField)
-					.showOnCreate(showOnCreate)
-					.build(objectType);
-		} else  {
-			entity = new ChatEntity.Builder()
-					.showOnCreate(showOnCreate)
-					.build(objectType);
+			entityBuilder.linkToTranscriptField(linkToTranscriptField);
 		}
+
+		if (linkToEntityName != null && linkToEntityField != null) {
+			entityBuilder.linkToAnotherSalesforceObject(linkToEntityName, linkToEntityField);
+		}
+
+		entity = entityBuilder.build(objectType);
 
 		if (keysEntityFieldToMap != null) {
 			for (int i = 0; i < keysEntityFieldToMap.size(); i++) {
