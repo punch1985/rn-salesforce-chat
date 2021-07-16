@@ -53,7 +53,7 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 	private final Map<String, ChatEntityField> chatEntityFieldMap;
 	private final List<ChatEntity> chatEntityList;
 
-	private ChatUIConfiguration chatUiConfiguration;
+	private ChatConfiguration chatConfiguration;
 
 	public RNSalesforceChatModule(ReactApplicationContext reactContext) {
 		super(reactContext);
@@ -88,22 +88,19 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 
 	@ReactMethod
 	public void createPreChatObject(String agentLabel, @Nullable String type, @Nullable String value, Boolean isDisplayedToAgent) {
-		switch (type) {
-			case "text":
-				PreChatTextInputField.Builder builder = new PreChatTextInputField.Builder();
-				builder.displayedToAgent(isDisplayedToAgent);
-				if (value != null) {
-					builder.initialValue(value);
-				}
-				chatUserDataMap.put(agentLabel, builder.build(agentLabel, agentLabel));
-				break;
-			default:
-				if (value != null) {
-					chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, value, isDisplayedToAgent));
-				} else {
-					chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, isDisplayedToAgent));
-				}
-				break;
+		if (type != null && type.equals("text")) {
+			PreChatTextInputField.Builder builder = new PreChatTextInputField.Builder();
+			builder.displayedToAgent(isDisplayedToAgent);
+			if (value != null) {
+				builder.initialValue(value);
+			}
+			chatUserDataMap.put(agentLabel, builder.build(agentLabel, agentLabel));
+		} else {
+			if (value != null) {
+				chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, value, isDisplayedToAgent));
+			} else {
+				chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, isDisplayedToAgent));
+			}
 		}
 	}
 
@@ -163,25 +160,25 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 
 		if (visitorName != null) chatConfigurationBuilder.visitorName(visitorName);
 
-		ChatConfiguration chatConfiguration = chatConfigurationBuilder
+		chatConfiguration = chatConfigurationBuilder
 				.chatUserData(new ArrayList<>(chatUserDataMap.values()))
 				.chatEntities(chatEntityList)
-				.build();
-
-		chatUiConfiguration = new ChatUIConfiguration.Builder()
-				.chatConfiguration(chatConfiguration)
-				.queueStyle(QueueStyle.Position)
-				.defaultToMinimized(false)
-				.disablePreChatView(true)
 				.build();
 	}
 
 	@ReactMethod
 	public void openChat(Boolean showPrechat, final Callback errorCallback) {
-		if (chatUiConfiguration == null) {
+		if (chatConfiguration == null) {
 			errorCallback.invoke("error - chat not configured");
 			return;
 		}
+
+		ChatUIConfiguration chatUiConfiguration = new ChatUIConfiguration.Builder()
+				.chatConfiguration(chatConfiguration)
+				.queueStyle(QueueStyle.Position)
+				.defaultToMinimized(false)
+				.disablePreChatView(!showPrechat)
+				.build();
 
 		ChatUI.configure(chatUiConfiguration)
 				.createClient(reactContext)
