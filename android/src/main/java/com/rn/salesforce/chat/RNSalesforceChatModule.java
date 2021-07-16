@@ -87,9 +87,10 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void createPreChatObject(String agentLabel, @Nullable String type, @Nullable String value, Boolean isDisplayedToAgent) {
+	public void createPreChatObject(String agentLabel, @Nullable String type, @Nullable String value, Boolean isRequired, Boolean isDisplayedToAgent) {
 		if (type != null && type.equals("text")) {
 			PreChatTextInputField.Builder builder = new PreChatTextInputField.Builder();
+			builder.required(isRequired)
 			builder.displayedToAgent(isDisplayedToAgent);
 			if (value != null) {
 				builder.initialValue(value);

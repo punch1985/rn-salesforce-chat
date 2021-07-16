@@ -60,6 +60,7 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(createPreChatObject:(NSString *)agentLabel
                   type:(NSString *)type
                   value:(NSString *)value
+                  isRequired:(BOOL)isRequired
                   isDisplayedToAgent:(BOOL)isDisplayedToAgent)
 {
     if ([type isEqualToString: @"text"]) {
@@ -67,6 +68,7 @@ RCT_EXPORT_METHOD(createPreChatObject:(NSString *)agentLabel
         if (value) {
             prechatObject.initialValue = value;
         }
+        prechatObject.isRequired = isRequired;
         prechatObject.displayToAgent = isDisplayedToAgent;
         prechatFields[agentLabel] = prechatObject;
     } else {
