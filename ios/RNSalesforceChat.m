@@ -68,7 +68,7 @@ RCT_EXPORT_METHOD(createPreChatObject:(NSString *)agentLabel
         if (value) {
             prechatObject.initialValue = value;
         }
-        prechatObject.isRequired = isRequired;
+        prechatObject.required = isRequired;
         prechatObject.displayToAgent = isDisplayedToAgent;
         prechatFields[agentLabel] = prechatObject;
     } else {
