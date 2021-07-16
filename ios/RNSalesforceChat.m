@@ -57,6 +57,26 @@ RCT_EXPORT_MODULE()
   };
 }
 
+RCT_EXPORT_METHOD(createPreChatObject:(NSString *)agentLabel
+                  type:(NSString *)type
+                  value:(NSString *)value
+                  isDisplayedToAgent:(BOOL)isDisplayedToAgent)
+{
+    if ([type isEqualToString: @"text"]) {
+        SCSPrechatTextInputObject* prechatObject = [[SCSPrechatTextInputObject alloc] initWithLabel:agentLabel];
+        if (value) {
+            prechatObject.initialValue = value;
+        }
+        prechatObject.displayToAgent = isDisplayedToAgent;
+        prechatFields[agentLabel] = prechatObject;
+    } else {
+        SCSPrechatObject* prechatObject = [[SCSPrechatObject alloc] initWithLabel:agentLabel value:value];
+        prechatObject.displayToAgent = isDisplayedToAgent;
+
+        prechatFields[agentLabel] = prechatObject;
+    }
+}
+
 RCT_EXPORT_METHOD(createPreChatData:(NSString *)agentLabel value:(NSString *)value
                   isDisplayedToAgent:(BOOL)isDisplayedToAgent)
 {
@@ -122,7 +142,7 @@ RCT_EXPORT_METHOD(configureChat:(NSString *)orgId buttonId:(NSString *)buttonId 
     chatConfiguration.prechatEntities = entities;
 }
 
-RCT_EXPORT_METHOD(openChat:(RCTResponseSenderBlock)errorCallback)
+RCT_EXPORT_METHOD(openChat:(BOOL)showPrechat errorCallback:(RCTResponseSenderBlock)errorCallback)
 {
     if (chatConfiguration == nil) {
         errorCallback(@[@"error - chat not configured"]);
@@ -131,7 +151,7 @@ RCT_EXPORT_METHOD(openChat:(RCTResponseSenderBlock)errorCallback)
 
     [[SCServiceCloud sharedInstance].chatCore removeDelegate:self];
     [[SCServiceCloud sharedInstance].chatCore addDelegate:self];
-    [[SCServiceCloud sharedInstance].chatUI showChatWithConfiguration:chatConfiguration];
+    [[SCServiceCloud sharedInstance].chatUI showChatWithConfiguration:chatConfiguration showPrechat:showPrechat];
 }
 
 - (NSArray<NSString *> *)supportedEvents

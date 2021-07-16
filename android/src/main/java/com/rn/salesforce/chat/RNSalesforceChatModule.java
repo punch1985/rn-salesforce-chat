@@ -21,6 +21,7 @@ import com.salesforce.android.chat.core.model.ChatUserData;
 import com.salesforce.android.chat.ui.ChatUI;
 import com.salesforce.android.chat.ui.ChatUIClient;
 import com.salesforce.android.chat.ui.ChatUIConfiguration;
+import com.salesforce.android.chat.ui.model.PreChatTextInputField;
 import com.salesforce.android.chat.ui.model.QueueStyle;
 import com.salesforce.android.service.common.utilities.control.Async;
 
@@ -83,6 +84,27 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 		constants.put(EndReasonTimeout, EndReasonTimeout);
 		constants.put(EndReasonSessionError, EndReasonSessionError);
 		return constants;
+	}
+
+	@ReactMethod
+	public void createPreChatObject(String agentLabel, @Nullable String type, @Nullable String value, Boolean isDisplayedToAgent) {
+		switch (type) {
+			case "text":
+				PreChatTextInputField.Builder builder = new PreChatTextInputField.Builder();
+				builder.displayedToAgent(isDisplayedToAgent);
+				if (value != null) {
+					builder.initialValue(value);
+				}
+				chatUserDataMap.put(agentLabel, builder.build(agentLabel, agentLabel));
+				break;
+			default:
+				if (value != null) {
+					chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, value, isDisplayedToAgent));
+				} else {
+					chatUserDataMap.put(agentLabel, new ChatUserData(agentLabel, isDisplayedToAgent));
+				}
+				break;
+		}
 	}
 
 	@ReactMethod
@@ -155,7 +177,7 @@ public class RNSalesforceChatModule extends ReactContextBaseJavaModule implement
 	}
 
 	@ReactMethod
-	public void openChat(final Callback errorCallback) {
+	public void openChat(Boolean showPrechat, final Callback errorCallback) {
 		if (chatUiConfiguration == null) {
 			errorCallback.invoke("error - chat not configured");
 			return;
